@@ -1,0 +1,10 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+.env.local
+migrated_prompt_history
+README.md
+Dockerfile
+.dockerignore

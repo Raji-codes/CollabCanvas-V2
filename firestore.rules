@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isValidShape(data) {
+      return data.type is string &&
+             data.createdAt is number;
+    }
+    
+    function isValidCursor(data) {
+      return data.id is string &&
+             data.x is number &&
+             data.y is number &&
+             data.lastActive is number;
+    }
+
+    function roomExists(roomId) {
+      return exists(/databases/$(database)/documents/rooms/$(roomId));
+    }
+
+    match /rooms/{roomId} {
+      allow create: if isAuthenticated();
+      allow read: if true;
+      allow update, delete: if isAuthenticated();
+
+      match /shapes/{shapeId} {
+        allow read: if true;
+        allow create, update, delete: if roomExists(roomId) && isValidShape(request.resource.data);
+      }
+
+      match /cursors/{cursorId} {
+        allow read: if true;
+        allow write: if roomExists(roomId) && isValidCursor(request.resource.data);
+      }
+    }
+  }
+}
