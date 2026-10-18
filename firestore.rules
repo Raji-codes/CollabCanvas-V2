@@ -21,6 +21,10 @@ service cloud.firestore {
       return exists(/databases/$(database)/documents/rooms/$(roomId));
     }
 
+    match /test/{docId} {
+      allow read: if true;
+    }
+
     match /rooms/{roomId} {
       allow create: if isAuthenticated();
       allow read: if true;
